@@ -451,36 +451,49 @@ class WiFiInfoApp:
         self.update_available_networks()
 
         # Schedule next update
-        self.master.after(5000, self.update_info)
+        self.master.after(25000, self.update_info)
         
     def update_available_networks(self):
-        try:
-            # Clear existing items
-            for item in self.networks_tree.get_children():
-                self.networks_tree.delete(item)
-
-            # Get available networks
-            command = "nmcli -t -f IN-USE,SSID,CHAN,RATE,SIGNAL,BARS,SECURITY device wifi list"
-            networks = subprocess.check_output(command, shell=True, text=True)
-        
-            # Process and insert each network
-            for line in networks.strip().split('\n'):
-                fields = line.split(':')
-                if len(fields) == 7:  # Ensure we have all required fields
-                    in_use, ssid, chan, rate, signal, bars, security = fields
+        def scan_networks():
+            try:
+                # Get available networks
+                command = "nmcli -t -f IN-USE,SSID,CHAN,RATE,SIGNAL,BARS,SECURITY device wifi list"
+                networks = subprocess.check_output(command, shell=True, text=True)
+            
+                # Process each network
+                network_list = []
+                for line in networks.strip().split('\n'):
+                    fields = line.split(':')
+                    if len(fields) == 7:  # Ensure we have all required fields
+                        in_use, ssid, chan, rate, signal, bars, security = fields
+                    
+                        # Clean up fields
+                        in_use = '*' if in_use == '*' else ''
+                        ssid = ssid if ssid else '--'
+                        rate = rate.replace('Mbit/s', '').strip() + ' Mbit/s'
+                        network_list.append((in_use, ssid, chan, rate, signal, bars, security))
+                    else:
+                        print(f"Skipping line due to incorrect number of fields: {fields}")
                 
-                    # Clean up fields
-                    in_use = '*' if in_use == '*' else ''
-                    ssid = ssid if ssid else '--'
-                    rate = rate.replace('Mbit/s', '').strip() + ' Mbit/s'
-                    self.networks_tree.insert("", "end", values=(in_use, ssid, chan, rate, signal, bars, security))
-                else:
-                    print(f"Skipping line due to incorrect number of fields: {fields}")
-        except subprocess.CalledProcessError as e:
-            print(f"Failed to update available networks: {e}")
-            print(f"Command output: {e.output}")
-        except Exception as e:
-            print(f"Unexpected error in update_available_networks: {e}")
+                # Update GUI in the main thread
+                self.master.after(0, self.update_network_display, network_list)
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to update available networks: {e}")
+                print(f"Command output: {e.output}")
+            except Exception as e:
+                print(f"Unexpected error in update_available_networks: {e}")
+
+        # Start the network scanning in a separate thread
+        threading.Thread(target=scan_networks).start()
+
+    def update_network_display(self, network_list):
+        # Clear existing items
+        for item in self.networks_tree.get_children():
+            self.networks_tree.delete(item)
+        
+        # Insert new items
+        for network in network_list:
+            self.networks_tree.insert("", "end", values=network)
 
     def get_network_band_info(self):
         try:
