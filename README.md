@@ -1,8 +1,8 @@
-# WiFi Information Application
+# WiFi Analyzer Application
 
 ## Description
 
-The WiFi Information Application is a comprehensive, Python-based tool designed to provide unparalleled insights into your WiFi environment. It offers a user-friendly graphical interface that displays a wealth of network parameters, connection details, and performs advanced network diagnostics, all in one intuitive snapshot.
+The WiFi Analyzer Application is a comprehensive, Python-based tool designed to provide unparalleled insights into your WiFi environment. It offers a user-friendly graphical interface that displays a wealth of network parameters, connection details, and performs advanced network diagnostics, all in one intuitive snapshot.
 
 ## Unique Features
 
@@ -12,7 +12,7 @@ Our application stands out with its ability to detect and extract captive portal
 
 ### Comprehensive WiFi View
 
-The WiFi Information Application offers more WiFi view features in a single snapshot than any other application currently available. Users can access a wide array of information including:
+The WiFi Analyzer Application offers more WiFi view features in a single snapshot than any other application currently available. Users can access a wide array of information including:
 
 - Detailed network identification (SSID, BSSID, security type)
 - Comprehensive connection details (IP configuration, gateway, DNS)
@@ -40,7 +40,7 @@ We're constantly looking to improve and expand the capabilities of our applicati
 
 ## Data Export
 
-The WiFi Information Application supports exporting data in multiple file formats, allowing users to easily save, share, or further analyze their network information. Supported formats include:
+The WiFi Analyzer Application supports exporting data in multiple file formats, allowing users to easily save, share, or further analyze their network information. Supported formats include:
 
 - CSV for easy spreadsheet integration
 - JSON for programmatic use
@@ -86,7 +86,7 @@ sudo python WiFiAnalyzer.py
 
 ## Contributing
 
-We welcome contributions to the WiFi Information Application! Whether it's adding new features, improving existing ones, or reporting bugs, your input is valuable. Please feel free to submit pull requests or create issues on our GitHub repository.
+We welcome contributions to the WiFi Analyzer Application! Whether it's adding new features, improving existing ones, or reporting bugs, your input is valuable. Please feel free to submit pull requests or create issues on our GitHub repository.
 
 ## License
 
