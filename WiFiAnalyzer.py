@@ -147,7 +147,8 @@ class WiFiInfoApp:
                 "IPv6 address": "Internet Protocol version 6 address assigned to your device",
                 "Gateway": "The IP address of the router or default gateway",
                 "DNS servers": "Domain Name System servers used for resolving domain names",
-                "IP Subnet Mask": "The subnet mask determines which part of an IP address belongs to the network and which part belongs to host addresses. It's displayed in dotted decimal notation (e.g., 255.255.255.0)."
+                "IP Subnet Mask": "The subnet mask determines which part of an IP address belongs to the network and which part belongs to host addresses. It's displayed in dotted decimal notation (e.g., 255.255.255.0).",
+                "Public IP": "The public IP address of your internet connection"
             },
             self.group3_frame: {
                 "Description": "A brief description of the WiFi adapter",
@@ -430,6 +431,7 @@ class WiFiInfoApp:
             "Gateway": "ip route | grep default | grep $(iw dev | awk '$1==\"Interface\"{print $2}') | awk '{print $3}'",
             "DNS servers": self.get_dns_servers,
             "IP Subnet Mask": "ip -4 addr show $(iw dev | awk '$1==\"Interface\"{print $2}') | grep -oP '(?<=inet\\s)\\S+' | cut -d'/' -f2",
+            "Public IP": "curl -s ifconfig.me",
             "Manufacturer": "lspci -nn | grep Network | cut -d ':' -f3 | cut -d '[' -f1",
             "Description": "lspci -nn | grep Network | cut -d ':' -f3",
             "Driver version": "modinfo $(lspci -k | grep -A3 Network | grep 'Kernel driver' | cut -d ':' -f2 | tr -d ' ') | grep version | head -n1 | awk '{print $2}'",
