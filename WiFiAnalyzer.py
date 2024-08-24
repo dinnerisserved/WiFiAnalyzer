@@ -1,8 +1,8 @@
 import tkinter as tk
-from tkinter import ttk, scrolledtext, Menu, messagebox, Toplevel, filedialog
+from tkinter import ttk, scrolledtext, Menu, messagebox, Toplevel, filedialog, simpledialog
+from datetime import datetime
 import subprocess
 import threading
-from datetime import datetime
 import re
 import csv
 
@@ -10,8 +10,8 @@ class WiFiInfoApp:
     def __init__(self, master):
         self.master = master
         self.version = "v0.9 beta"
-        master.title(f"WiFi Information {self.version}")
-        master.geometry("1200x800")
+        master.title(f"WiFi Analyzer {self.version}")
+        master.geometry("1200x1000")
 
         # Create menu
         self.menu_bar = Menu(master)
@@ -55,7 +55,7 @@ class WiFiInfoApp:
         self.setup_advanced_tab()
 
         # Version label
-        self.version_label = ttk.Label(master, text=f"WiFi Information {self.version}", font=('Arial', 8))
+        self.version_label = ttk.Label(master, text=f"WiFi Analyzer {self.version}", font=('Arial', 8))
         self.version_label.pack(side=tk.BOTTOM, anchor=tk.SE, padx=5, pady=5)
 
         # Initial update of fixed info
@@ -164,7 +164,6 @@ class WiFiInfoApp:
                 "Signal Strength": "The strength of the WiFi signal, usually measured in dBm",
                 "Link Speed": "The current speed of the WiFi connection",
                 "TX Power": "Transmit Power: The power output of the WiFi adapter",
-                "Connection Uptime": "The total time the system has been running"
             }
         }
 
@@ -176,12 +175,15 @@ class WiFiInfoApp:
         # Create a scrolled text widget for output
         self.output_text = scrolledtext.ScrolledText(self.advanced_tab, wrap=tk.WORD, bg='black', fg='white', font=('Courier', 10))
         self.output_text.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(5, 10), pady=10)
+        
+        # Create a button for changing the MAC address
+        self.change_mac_button = ttk.Button(self.button_frame, text="Change MAC Address", command=self.change_mac_address, width=20)
+        self.change_mac_button.pack(pady=2)
 
         # Define commands and their corresponding button labels
         self.commands = {
             "Supported Ciphers": "iw phy | grep -A10 'Supported Ciphers:'",
             "VHT Capabilities": "iw phy | grep -A20 'VHT Capabilities'",
-            "RF Kill Switch Status": "rfkill list | grep -A2 'Wireless'",
             "Regulatory Domain": "iw reg get"
         }
         # Create buttons for each command
@@ -267,8 +269,6 @@ class WiFiInfoApp:
             if output == expected_content.strip():
                 return "No captive portal"
             elif output.startswith("<!DOCTYPE html") or output.startswith("<html"):
-                # This is likely the captive portal page
-                # Try to extract the actual portal URL
                 match = re.search(r'<form.*?action="(https?://[^"]+)"', output, re.DOTALL)
                 if match:
                     portal_url = match.group(1)
@@ -283,6 +283,28 @@ class WiFiInfoApp:
             return "Check timed out"
         except Exception as e:
             return "Unexpected error"
+
+    def change_mac_address(self):
+       new_mac = simpledialog.askstring("Change MAC Address", "Enter the new MAC address:")
+       if new_mac:
+            try:
+                # Get the interface name
+                interface = subprocess.check_output("iw dev | awk '$1==\"Interface\"{print $2}'", shell=True, text=True).strip()
+
+                # Disable the interface
+                subprocess.run(f"sudo ip link set {interface} down", shell=True, check=True)
+
+                # Change the MAC address
+                subprocess.run(f"sudo ip link set {interface} address {new_mac}", shell=True, check=True)
+
+                # Enable the interface
+                subprocess.run(f"sudo ip link set {interface} up", shell=True, check=True)
+
+                messagebox.showinfo("Success", "MAC address changed successfully.")
+            except subprocess.CalledProcessError as e:
+                messagebox.showerror("Error", f"Failed to change MAC address: {e.output}")
+            except Exception as e:
+                messagebox.showerror("Error", f"Unexpected error: {e}")
 
     def get_dns_servers(self):
         try:
@@ -392,7 +414,6 @@ class WiFiInfoApp:
             return "Invalid CIDR notation"
 
     def update_info(self):
-        # Define maximum length for displayed text
         max_length = 50  # You can adjust this value as needed
 
         commands = {
@@ -418,7 +439,6 @@ class WiFiInfoApp:
             "Frequency": "iw dev $(iw dev | awk '$1==\"Interface\"{print $2}') link | grep 'freq:' | awk '{print $2\" MHz\"}'",
             "Signal Strength": "iw dev $(iw dev | awk '$1==\"Interface\"{print $2}') link | grep 'signal:' | awk '{print $2\" \"$3}'",
             "TX Power": "iw dev $(iw dev | awk '$1==\"Interface\"{print $2}') info | grep 'txpower' | awk '{print $2\" \"$3}'",
-            "Connection Uptime": "uptime -p",
 			"Power Management": "iwconfig $(iw dev | awk '$1==\"Interface\"{print $2}') | grep 'Power Management:' | awk '{print $NF}'"
         }
 
@@ -550,9 +570,9 @@ class WiFiInfoApp:
 
     def show_about(self):
         about_window = Toplevel(self.master)
-        about_window.title("About WiFi Information App")
-        about_window.geometry("300x100")
-        
+        about_window.title("About WiFi Analyzer")
+        about_window.geometry("600x300")
+    
         # Center the window
         about_window.update_idletasks()
         width = about_window.winfo_width()
@@ -560,8 +580,15 @@ class WiFiInfoApp:
         x = (about_window.winfo_screenwidth() // 2) - (width // 2)
         y = (about_window.winfo_screenheight() // 2) - (height // 2)
         about_window.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-        
-        about_label = ttk.Label(about_window, text=f"WiFi Information App\nVersion: {self.version}\n\nDeveloped by Your Name", font=('Arial', 12))
+    
+        about_text = f"""WiFi Analyzer
+        Version: {self.version}
+
+        The WiFi Analyzer Application is a comprehensive, Python-based tool designed to provide unparalleled insights into your WiFi environment. It offers a user-friendly graphical interface that displays a wealth of network parameters, connection details, and performs advanced network diagnostics, all in one intuitive snapshot.
+
+        Developed by dinnerisserver"""
+    
+        about_label = ttk.Label(about_window, text=about_text, font=('Arial', 12), wraplength=550, justify='center')
         about_label.pack(expand=True)
 
 if __name__ == "__main__":
