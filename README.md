@@ -22,14 +22,6 @@ The WiFi Information Application offers more WiFi view features in a single snap
 
 ## Expandability and Future Features
 
-### API Integration
-
-The application is designed with expandability in mind. It includes an API that allows for easy integration with other tools and services. This opens up possibilities for:
-
-- Creating custom front-ends or mobile applications
-- Integrating WiFi information into other network management tools
-- Developing plugins for various platforms
-
 ### Statistical Graphing
 
 With the wealth of data already collected and displayed, the application is primed for expansion into statistical analysis and graphing. Future updates could include:
@@ -42,7 +34,6 @@ With the wealth of data already collected and displayed, the application is prim
 
 We're constantly looking to improve and expand the capabilities of our application. Some potential future features include:
 
-- MAC address switching for enhanced privacy
 - Integration with third-party tools like nmap for more advanced network scanning
 - Automated speed tests and performance benchmarking
 - Custom alerts for network changes or security issues
@@ -53,7 +44,6 @@ The WiFi Information Application supports exporting data in multiple file format
 
 - CSV for easy spreadsheet integration
 - JSON for programmatic use
-- PDF for professional reporting
 
 ## Requirements
 
